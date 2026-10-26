@@ -1,0 +1,17 @@
+url: https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/
+template:
+  bootstrap: 5
+  bootswatch: minty
+
+reference:
+  - title: Core functions
+    contents:
+      - calculate_risk
+      - run_app
+  - title: Datasets
+    contents:
+      - quarantine_risk
+
+articles:
+  - title: Getting started
+    contents: get-started

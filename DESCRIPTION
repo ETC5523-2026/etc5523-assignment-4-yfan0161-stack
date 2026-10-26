@@ -1,0 +1,25 @@
+Package: quarantineRisk
+Title: Calculate Border Quarantine Breach Risk
+Version: 0.1.0
+Authors@R: 
+    person("Yunhui", "Fan", , "yunhui.fan@student.monash.edu", role = c("aut", "cre"))
+Description: An R package with an interactive Shiny app to explore how viral
+    transmissibility and vaccine efficacy affect border quarantine breach risk,
+    based on modelling results from Zachreson et al. (2022).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends: 
+    R (>= 3.5)
+Imports: 
+    ggplot2,
+    shiny,
+    bslib
+Suggests: 
+    pkgdown,
+    devtools,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+LazyData: true
+Config/roxygen2/version: 8.1.0
