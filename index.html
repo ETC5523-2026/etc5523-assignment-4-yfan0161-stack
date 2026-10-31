@@ -10,8 +10,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Calculate Border Quarantine Breach Risk">
-<meta name="description" content="An R package with an interactive Shiny app to explore how viral transmissibility and vaccine efficacy affect border quarantine breach risk, based on modelling results from Zachreson et al. (2022).">
-<meta property="og:description" content="An R package with an interactive Shiny app to explore how viral transmissibility and vaccine efficacy affect border quarantine breach risk, based on modelling results from Zachreson et al. (2022).">
+<meta name="description" content="An R package with an interactive Shiny app to explore how viral transmissibility and vaccine efficacy affect border quarantine breach risk, based on modelling results from Zachreson et al. (2022). It includes the results as a dataset, functions to interpolate risk and to find the minimum vaccine efficacy needed to reach a target risk, and a Shiny app for public health students and policy analysts.">
+<meta property="og:description" content="An R package with an interactive Shiny app to explore how viral transmissibility and vaccine efficacy affect border quarantine breach risk, based on modelling results from Zachreson et al. (2022). It includes the results as a dataset, functions to interpolate risk and to find the minimum vaccine efficacy needed to reach a target risk, and a Shiny app for public health students and policy analysts.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -37,6 +37,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ETC5523-2026/etc5523-assignment-4-yfan0161-stack/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -47,11 +48,12 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="quarantinerisk">quarantineRisk<a class="anchor" aria-label="anchor" href="#quarantinerisk"></a>
 </h1></div>
-<p>An R package with an interactive Shiny app to explore how viral transmissibility and vaccine efficacy affect border quarantine breach risk.</p>
+<p>An R package with an interactive Shiny app to explore how viral transmissibility (R0) and vaccine efficacy (VE) affect border quarantine breach risk.</p>
+<p><strong>Intended user:</strong> public health students and policy analysts.</p>
+<p><strong>Question the app helps answer:</strong> for a variant with a given R0, how much vaccine efficacy is needed to keep border-quarantine breach risk at or below an acceptable level, relative to the pre-Delta unvaccinated baseline?</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of quarantineRisk from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install-deprecated.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ETC5523-2026/etc5523-assignment-4-yfan0161-stack"</span><span class="op">)</span></span></code></pre></div>
@@ -60,34 +62,45 @@
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <div class="section level3">
-<h3 id="calculate-risk-for-a-single-scenario">Calculate risk for a single scenario<a class="anchor" aria-label="anchor" href="#calculate-risk-for-a-single-scenario"></a>
-</h3>
-<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">quarantineRisk</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/calculate_risk.html">calculate_risk</a></span><span class="op">(</span>r0 <span class="op">=</span> <span class="fl">6</span>, ve <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre>
-</div>
-<div class="section level3">
 <h3 id="launch-the-interactive-app">Launch the interactive app<a class="anchor" aria-label="anchor" href="#launch-the-interactive-app"></a>
 </h3>
-<pre><code><span><span class="fu"><a href="reference/run_app.html">run_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/">quarantineRisk</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/run_app.html">run_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="calculate-risk-for-a-single-scenario">Calculate risk for a single scenario<a class="anchor" aria-label="anchor" href="#calculate-risk-for-a-single-scenario"></a>
+</h3>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/calculate_risk.html">calculate_risk</a></span><span class="op">(</span>r0 <span class="op">=</span> <span class="fl">6</span>, ve <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span>      <span class="co"># risk relative to baseline</span></span>
+<span><span class="fu"><a href="reference/find_threshold_ve.html">find_threshold_ve</a></span><span class="op">(</span>r0 <span class="op">=</span> <span class="fl">6</span>, target <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># minimum VE to keep risk &lt;= baseline</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="data-source">Data source<a class="anchor" aria-label="anchor" href="#data-source"></a>
+<h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h2>
-<p>Data is adapted from Zachreson et al. (2022), <em>COVID-19 in low-tolerance border quarantine systems</em>, Science Advances.</p>
+<p>The package includes <code>quarantine_risk</code>, a 100-row data frame (R0 = 1 to 10, VE = 0 to 0.9) giving total infection force relative to the pre-Delta unvaccinated baseline (1 = baseline). The values were transcribed from Figure 4 of Zachreson et al. (2022), <em>COVID-19 in low-tolerance border quarantine systems: Impact of the Delta variant of SARS-CoV-2</em>, Science Advances, 8(14), eabm3624 (<a href="https://doi.org/10.1126/sciadv.abm3624" class="external-link uri">https://doi.org/10.1126/sciadv.abm3624</a>), which is open access under a CC BY 4.0 licence. The raw values and the preparation script are in <code>data-raw/</code>. Values are relative risks from simulation results, not probabilities of a breach.</p>
 </div>
 <div class="section level2">
 <h2 id="website">Website<a class="anchor" aria-label="anchor" href="#website"></a>
 </h2>
-<p>Full documentation: <a href="https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/">https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/</a></p>
+<p>Full documentation: <a href="https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/" class="uri">https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/</a></p>
 </div>
 <div class="section level2">
 <h2 id="ai-use-declaration">AI-use declaration<a class="anchor" aria-label="anchor" href="#ai-use-declaration"></a>
 </h2>
-<p>Generative AI declaration: I used ChatGPT to suggest Shiny UI layout alternatives and help debug package build errors. I checked and revised all generated code and text.</p>
+<p>Generative AI declaration: I used ChatGPT to suggest Shiny UI layout alternatives and help debug package build errors. I used Claude (Anthropic) to review my package against the assignment criteria and to suggest revisions to the Shiny app, the <code><a href="reference/find_threshold_ve.html">find_threshold_ve()</a></code> function, tests, documentation and vignette. I checked, tested and revised all generated code and text.</p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/ETC5523-2026/etc5523-assignment-4-yfan0161-stack/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ETC5523-2026/etc5523-assignment-4-yfan0161-stack/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
