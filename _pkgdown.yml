@@ -7,6 +7,7 @@ reference:
   - title: Core functions
     contents:
       - calculate_risk
+      - find_threshold_ve
       - run_app
   - title: Datasets
     contents:

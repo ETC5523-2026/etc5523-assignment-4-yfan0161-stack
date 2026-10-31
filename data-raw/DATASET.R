@@ -1,6 +1,6 @@
 # Reproducible preparation of the `quarantine_risk` dataset.
 # Source: Zachreson et al. (2022), "COVID-19 in low-tolerance border quarantine
-# systems", Science Advances. Values transcribed from <FIGURE/TABLE NUMBER>
+# systems", Science Advances. Values transcribed from Figure 4
 # of the paper into data-raw/zachreson2022_beta_ratio.csv
 # (rows = R0, columns = vaccine efficacy).
 # Run from the package root:  source("data-raw/DATASET.R")

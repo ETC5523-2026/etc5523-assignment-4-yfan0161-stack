@@ -1,69 +1,131 @@
 # Get started with quarantineRisk
 
-## Installation
+**Who this is for:** public health students and policy analysts.
+**Question:** for a variant with a given transmissibility (R₀), how much
+vaccine efficacy (VE) is needed to keep border-quarantine breach risk at
+or below an acceptable level, compared with the pre-Delta baseline?
 
-You can install the package from GitHub:
+## Installation
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("ETC5523-2026/etc5523-assignment-4-yfan0161-stack")
 ```
 
-## Load the package
-
 ``` r
 library(quarantineRisk)
+library(ggplot2)
 ```
 
-## Calculate risk for a specific scenario
+## The data
 
-Use
-[`calculate_risk()`](https://ETC5523-2026.github.io/etc5523-assignment-4-yfan0161-stack/reference/calculate_risk.md)
-to get the relative breach risk for a given combination of viral
-transmissibility and vaccine efficacy.
+`quarantine_risk` holds model results adapted from Zachreson et
+al. (2022) for R₀ from 1 to 10 and VE from 0 to 0.9.
+
+``` r
+head(quarantine_risk)
+#> # A tibble: 6 × 3
+#>      R0    VE beta_ratio
+#>   <int> <dbl>      <dbl>
+#> 1     1   0       0.163 
+#> 2     1   0.1     0.143 
+#> 3     1   0.2     0.132 
+#> 4     1   0.3     0.127 
+#> 5     1   0.4     0.0972
+#> 6     1   0.5     0.0607
+```
+
+| Field | Meaning |
+|----|----|
+| `R0` | Basic reproduction number (average number of people one case infects) |
+| `VE` | Vaccine efficacy (0 = no protection, 0.9 = 90% reduction) |
+| `beta_ratio` | Total infection force relative to the pre-Delta unvaccinated baseline (1 = baseline) |
+
+`beta_ratio` is a relative multiplier, not a probability. In this
+dataset the baseline value of 1 is reached at R₀ = 3 with no
+vaccination.
+
+## Calculate risk for one scenario
 
 ``` r
 calculate_risk(r0 = 6, ve = 0.6)
 #> [1] 0.74
-```
-
-The returned value is a multiplier relative to a pre-Delta unvaccinated
-baseline.
-
-- Values **below 1** mean the system is safer than baseline.
-- Values **above 1** mean elevated breach risk.
-
-For example, at an R₀ of 6 and 50% vaccine efficacy, the risk is
-approximately equal to baseline:
-
-``` r
 calculate_risk(r0 = 6, ve = 0.5)
 #> [1] 1.01
+calculate_risk(r0 = 6, ve = 0.3)
+#> [1] 1.82
 ```
 
-## Launch the interactive Shiny app
+Values below 1 are better than the baseline; values above 1 mean
+elevated breach risk. Values between grid points are linearly
+interpolated.
 
-To explore the full heatmap and adjust parameters in real time, launch
-the built-in application:
+## Find the vaccine efficacy needed
+
+``` r
+find_threshold_ve(r0 = 6, target = 1)
+#> [1] 0.504
+find_threshold_ve(r0 = 6, target = 0.5)
+#> [1] 0.654
+```
+
+At R₀ = 6, VE must reach about 0.504 to keep risk at or below the
+baseline. If the target cannot be met even at VE = 0.9, the function
+returns `NA`:
+
+``` r
+find_threshold_ve(r0 = 10, target = 0.1)
+#> [1] NA
+```
+
+``` r
+ve <- seq(0, 0.9, by = 0.01)
+d <- data.frame(VE = ve, risk = calculate_risk(6, ve))
+ggplot(d, aes(VE, risk)) +
+  geom_line(colour = "#2d6a4f", linewidth = 1) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  geom_vline(xintercept = find_threshold_ve(6), linetype = "dotted", colour = "#c1121f") +
+  labs(x = "Vaccine efficacy", y = "Risk (× baseline)",
+       subtitle = "R0 = 6; dashed = baseline, dotted = minimum VE") +
+  theme_minimal()
+```
+
+![](get-started_files/figure-html/unnamed-chunk-7-1.png)
+
+## Launch the Shiny app
 
 ``` r
 run_app()
 ```
 
-The app provides:
+**Controls**
 
-- Two sliders to adjust R₀ and vaccine efficacy
-- A numeric summary of current risk level and status
-- An interactive heatmap with a marker showing your current selection
-- A thick baseline contour line showing where risk equals 1× baseline
+- *R₀ slider*: transmissibility of the variant.
+- *VE slider*: vaccine efficacy in the population.
+- *Acceptable risk*: your tolerance as a multiple of the baseline (must
+  be greater than 0; otherwise the app shows a message).
 
-## How to interpret outputs
+**Outputs and how to read them**
 
-The heatmap uses a green-to-yellow colour scale. Darker green represents
-lower risk, and brighter yellow represents higher risk. The thick green
-line marks the baseline threshold.
+- The *risk card* compares the modelled risk at your R₀ and VE with your
+  target (green = below, amber = about equal, red = above).
+- The *minimum VE card* gives the lowest VE that reaches your target at
+  that R₀. This directly answers the app’s question.
+- In the *heatmap*, dark green is low risk and yellow/red is high. The
+  dashed line marks your target: combinations above and to the left of
+  it (high VE, low R₀) meet the target; those below and to the right
+  exceed it. The white dot is your selection.
+- The *line plot* is a slice of the heatmap at your R₀; the dotted line
+  shows the minimum VE.
 
-When interpreting results, remember this is output from a simulation
-model. It assumes standardised quarantine protocols and consistent
-vaccine performance. Real-world outcomes will also depend on staffing,
-testing accuracy, and traveller compliance. \`\`\`
+If you enter an acceptable risk that is empty, zero or negative, the app
+asks you to correct it. If the target cannot be met at any modelled VE,
+the app says so and suggests a higher tolerance or a lower R₀.
+
+## Limitations
+
+- Results are relative risks from published simulations of low-tolerance
+  quarantine systems, not probabilities of a breach.
+- The data is a 10 × 10 grid with linear interpolation between points,
+  and the simulation output contains some noise.
+- The package is for exploring scenarios, not for operational decisions.

@@ -6,6 +6,10 @@ library(bslib)
 heat_grid <- expand.grid(R0 = seq(1, 10, by = 0.1), VE = seq(0, 0.9, by = 0.01))
 heat_grid$risk <- quarantineRisk::calculate_risk(heat_grid$R0, heat_grid$VE)
 
+# Round the required VE UP to 2 decimals so the displayed value is never
+# lower than the true threshold
+th_label <- function(th) sprintf("%.2f", ceiling(th * 100 - 1e-9) / 100)
+
 app_css <- "
 .app-header {background:#2d6a4f; color:#fff; padding:18px 24px; border-radius:8px; margin-bottom:18px;}
 .app-header h2 {margin:0 0 8px 0;}
@@ -16,7 +20,6 @@ app_css <- "
 .result-card h2 {margin:2px 0;}
 .result-card .status {font-weight:600;}
 .note-box {background:#eef7f1; border-radius:8px; padding:12px 16px; margin:6px 0 16px 0;}
-.shiny-output-error-validation {color:#b35c00; font-weight:600; padding:10px 0;}
 "
 
 ui <- fluidPage(
@@ -55,15 +58,20 @@ ui <- fluidPage(
         tabPanel(
           "Explore",
           br(),
-          fluidRow(
-            column(6, uiOutput("risk_card")),
-            column(6, uiOutput("threshold_card"))
-          ),
-          uiOutput("takeaway"),
-          h4("Risk across all scenarios"),
-          plotOutput("heatmap", height = "380px"),
-          h4("Risk at your chosen R\u2080, across vaccine efficacy"),
-          plotOutput("cross", height = "300px")
+          # Weak state: one clear message instead of repeating it in every output
+          uiOutput("target_warning"),
+          conditionalPanel(
+            condition = "input.target > 0",
+            fluidRow(
+              column(6, uiOutput("risk_card")),
+              column(6, uiOutput("threshold_card"))
+            ),
+            uiOutput("takeaway"),
+            h4("Risk across all scenarios"),
+            plotOutput("heatmap", height = "380px"),
+            h4("Risk at your chosen R\u2080, across vaccine efficacy"),
+            plotOutput("cross", height = "300px")
+          )
         ),
 
         tabPanel(
@@ -104,7 +112,8 @@ ui <- fluidPage(
                     your target. Green border = below target, amber = about equal (within 5%),
                     red = above target."),
             tags$li(strong("Minimum VE card: "), "the lowest VE at which quarantine reaches your
-                    target for that R\u2080. This is the direct answer to the app's question."),
+                    target for that R\u2080 (rounded up to two decimals). This is the direct answer
+                    to the app's question."),
             tags$li(strong("Heatmap: "), "dark green = low risk, yellow/red = high risk. The dashed
                     line marks your target. Combinations ", em("above and to the left"), " of the line
                     (high VE, low R\u2080) meet the target; those ", em("below and to the right"),
@@ -118,8 +127,8 @@ ui <- fluidPage(
                     they are relative risks, not predicted probabilities of a breach."),
             tags$li("The data is a 10 \u00d7 10 grid; values between grid points are linearly
                     interpolated."),
-            tags$li("The underlying results come from simulations and contain some noise, so the curve
-                    is not perfectly smooth."),
+            tags$li("The underlying results come from simulations and contain some noise, so the
+                    dashed line is not perfectly smooth."),
             tags$li("Use for exploring scenarios and teaching, not for operational decisions.")
           )
         )
@@ -131,12 +140,25 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   # Weak state: empty / zero / negative target
+  target_ok <- reactive({
+    is.numeric(input$target) && !is.na(input$target) && input$target > 0
+  })
+
   target <- reactive({
-    validate(need(
-      is.numeric(input$target) && !is.na(input$target) && input$target > 0,
-      "Please enter an acceptable risk greater than 0 (1 = the pre-Delta baseline)."
-    ))
+    req(target_ok())
     input$target
+  })
+
+  output$target_warning <- renderUI({
+    if (!target_ok()) {
+      div(
+        class = "result-card warn",
+        strong("Please enter an acceptable risk greater than 0"),
+        p("The acceptable risk is a multiple of the pre-Delta baseline
+           (1 = the same risk as the baseline, 0.5 = half, 2 = twice).
+           Results will appear once a valid value is entered.")
+      )
+    }
   })
 
   risk_now <- reactive({
@@ -187,7 +209,7 @@ server <- function(input, output, session) {
       div(
         class = "result-card",
         p("Minimum VE needed", style = "margin:0;"),
-        h2(paste0("VE \u2265 ", sprintf("%.2f", th))),
+        h2(paste0("VE \u2265 ", th_label(th))),
         div(class = "status", paste0("to keep risk \u2264 ", tgt, "\u00d7 baseline"))
       )
     }
@@ -196,6 +218,7 @@ server <- function(input, output, session) {
   output$takeaway <- renderUI({
     tgt <- target()
     th <- threshold()
+    val <- risk_now()
     msg <- if (is.na(th)) {
       paste0("At R\u2080 = ", input$r0, ", no modelled vaccine efficacy brings breach risk down to ",
              tgt, "\u00d7 baseline.")
@@ -203,10 +226,16 @@ server <- function(input, output, session) {
       paste0("At R\u2080 = ", input$r0, ", quarantine meets your target of ", tgt,
              "\u00d7 baseline even without vaccination.")
     } else {
+      verdict <- if (input$ve >= th) {
+        " meets that requirement."
+      } else if (val / tgt <= 1.05) {
+        " is just below it (risk is within 5% of your target)."
+      } else {
+        " falls short of it."
+      }
       paste0("At R\u2080 = ", input$r0, ", quarantine stays at or below ", tgt,
-             "\u00d7 baseline only if vaccine efficacy is at least ", sprintf("%.2f", th),
-             ". Your selected VE of ", input$ve,
-             if (input$ve >= th) " meets that requirement." else " falls short of it.")
+             "\u00d7 baseline only if vaccine efficacy is at least ", th_label(th),
+             ". Your selected VE of ", input$ve, verdict)
     }
     div(class = "note-box", msg)
   })

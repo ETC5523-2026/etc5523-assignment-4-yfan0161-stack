@@ -3,23 +3,33 @@
 \docType{data}
 \name{quarantine_risk}
 \alias{quarantine_risk}
-\title{Quarantine breach risk dataset}
+\title{quarantine_risk: Quarantine breach risk dataset}
 \format{
 A data frame with 100 rows and 3 variables:
 \describe{
 \item{R0}{Basic reproduction number, integer from 1 to 10}
 \item{VE}{Vaccine efficacy, numeric from 0 to 0.9}
-\item{beta_ratio}{Total infection force relative to pre-Delta unvaccinated baseline}
+\item{beta_ratio}{Total infection force relative to the pre-Delta
+unvaccinated baseline (1 = baseline)}
 }
 }
 \source{
-Zachreson et al. (2022). COVID-19 in low-tolerance border quarantine systems. \emph{Science Advances}.
+Zachreson, C., et al. (2022). COVID-19 in low-tolerance border
+quarantine systems: Impact of the Delta variant of SARS-CoV-2.
+\emph{Science Advances}, 8(14), eabm3624.
+\url{https://doi.org/10.1126/sciadv.abm3624}
 }
 \usage{
 quarantine_risk
 }
 \description{
-Total infection force relative to baseline, across different values of
-viral transmissibility (R0) and vaccine efficacy (VE).
+Total infection force relative to the pre-Delta unvaccinated baseline,
+across combinations of viral transmissibility (R0) and vaccine efficacy (VE).
+}
+\details{
+The values were transcribed from Figure 4 of Zachreson et al. (2022); see
+\code{data-raw/DATASET.R} for the preparation script. The baseline (value 1) is
+reached at R0 = 3 with no vaccination. The results come from simulations, so
+the grid contains some noise and is not perfectly monotone.
 }
 \keyword{datasets}

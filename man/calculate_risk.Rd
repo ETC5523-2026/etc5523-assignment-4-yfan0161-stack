@@ -4,20 +4,28 @@
 \alias{calculate_risk}
 \title{Calculate quarantine breach risk}
 \usage{
-calculate_risk(r0, ve)
+calculate_risk(r0, ve, digits = 3)
 }
 \arguments{
-\item{r0}{Numeric. Basic reproduction number, between 1 and 10.}
+\item{r0}{Numeric. Basic reproduction number, between 1 and 10. Can be a
+vector.}
 
-\item{ve}{Numeric. Vaccine efficacy, between 0 and 0.9.}
+\item{ve}{Numeric. Vaccine efficacy, between 0 and 0.9. Can be a vector.
+\code{r0} and \code{ve} must have length 1 or the same length.}
+
+\item{digits}{Integer. Number of decimal places to round the result to.
+Default is 3.}
 }
 \value{
-Numeric value: risk multiplier relative to baseline.
+Numeric vector: risk multiplier relative to baseline (1 = same
+as the baseline).
 }
 \description{
-Returns relative breach risk for a given R0 and vaccine efficacy,
-using bilinear interpolation from the baseline dataset.
+Returns the breach risk, relative to the pre-Delta unvaccinated baseline,
+for a given R0 and vaccine efficacy. Values between grid points of
+\link{quarantine_risk} are obtained by bilinear interpolation.
 }
 \examples{
 calculate_risk(r0 = 6, ve = 0.6)
+calculate_risk(r0 = c(2, 4, 6), ve = 0.5)
 }
