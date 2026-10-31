@@ -1,26 +1,28 @@
-library(tidyverse)
+# Reproducible preparation of the `quarantine_risk` dataset.
+# Source: Zachreson et al. (2022), "COVID-19 in low-tolerance border quarantine
+# systems", Science Advances. Values transcribed from <FIGURE/TABLE NUMBER>
+# of the paper into data-raw/zachreson2022_beta_ratio.csv
+# (rows = R0, columns = vaccine efficacy).
+# Run from the package root:  source("data-raw/DATASET.R")
 
-# Data adapted from Zachreson et al. (2022)
-# COVID-19 in low-tolerance border quarantine systems
-# Science Advances
-# Values represent total infection force relative to pre-Delta unvaccinated baseline
+library(readr)
+library(dplyr)
+library(tidyr)
 
-quarantine_risk <- tibble(
-  R0 = rep(1:10, each = 10),
-  VE = rep(seq(0, 0.9, by = 0.1), 10),
-  beta_ratio = c(
-    0.163, 0.143, 0.132, 0.127, 0.0972, 0.0607, 0.0402, 0.037, 0.0167, 0.017,
-    0.539, 0.366, 0.341, 0.286, 0.21, 0.188, 0.104, 0.0487, 0.0547, 0.025,
-    1, 0.934, 0.564, 0.518, 0.388, 0.292, 0.224, 0.122, 0.106, 0.0357,
-    1.57, 1.42, 0.98, 0.918, 0.639, 0.469, 0.308, 0.233, 0.175, 0.0361,
-    2.16, 1.9, 1.65, 1.26, 1.06, 0.602, 0.454, 0.345, 0.214, 0.0757,
-    2.98, 2.56, 2.25, 1.82, 1.38, 1.01, 0.74, 0.298, 0.25, 0.0816,
-    4.3, 3.4, 2.91, 2.78, 1.64, 1.02, 1.02, 0.546, 0.22, 0.107,
-    5.97, 4.38, 3.58, 2.83, 2.04, 1.9, 1.2, 0.635, 0.38, 0.134,
-    7.34, 5.15, 4.23, 3.56, 2.65, 2.22, 1.49, 1.07, 0.432, 0.138,
-    7.38, 6.81, 4.88, 4.02, 4.01, 2.4, 1.5, 1.17, 0.528, 0.216
-  )
+raw <- read_csv("data-raw/zachreson2022_beta_ratio.csv", show_col_types = FALSE)
+
+quarantine_risk <- raw |>
+  pivot_longer(-R0, names_to = "VE", values_to = "beta_ratio") |>
+  mutate(R0 = as.integer(R0), VE = as.numeric(VE)) |>
+  arrange(R0, VE)
+
+# Sanity checks
+stopifnot(
+  nrow(quarantine_risk) == 100,
+  !anyNA(quarantine_risk),
+  all(quarantine_risk$beta_ratio > 0),
+  all(quarantine_risk$R0 %in% 1:10),
+  all(quarantine_risk$VE >= 0 & quarantine_risk$VE <= 0.9)
 )
 
 usethis::use_data(quarantine_risk, overwrite = TRUE)
-
