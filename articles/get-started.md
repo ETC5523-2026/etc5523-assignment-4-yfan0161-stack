@@ -36,15 +36,40 @@ head(quarantine_risk)
 #> 6  1 0.5     0.0607
 ```
 
-| Field | Meaning |
-|----|----|
-| `R0` | Basic reproduction number (average number of people one case infects) |
-| `VE` | Vaccine efficacy (0 = no protection, 0.9 = 90% reduction) |
-| `beta_ratio` | Total infection force relative to the pre-Delta unvaccinated baseline (1 = baseline) |
+### Key terms
 
-`beta_ratio` is a relative multiplier, not a probability. In this
-dataset the baseline value of 1 is reached at R₀ = 3 with no
-vaccination.
+Before using the app, here are the terms it relies on:
+
+| Term | In plain language | Example |
+|----|----|----|
+| R₀ | The average number of people one infected person passes the virus to. | R₀ = 3: one case infects about 3 others. R₀ = 6: about 6. The higher it is, the harder it is to keep quarantine leak-free. |
+| VE (vaccine efficacy) | How strongly vaccination protects (0 = no protection, 0.9 = 90% protection). | VE = 0.6 means 60% protection. |
+| Baseline | The benchmark risk that quarantine was designed around: the original virus with no vaccination. In this dataset it equals R₀ = 3 and VE = 0. | Baseline = 1×. |
+| Breach | An infection that escapes quarantine into the community. | A traveller infected in quarantine who leaves still infectious. |
+| Risk (× baseline) | A score comparing a scenario with the baseline: 1 = the same, 2 = twice as much, 0.5 = half. It is not a probability. | R₀ = 10 and VE = 0.1 gives 6.8× baseline. |
+| Acceptable risk | The highest risk you are willing to tolerate, as a multiple of the baseline. | 1 = no worse than baseline; 2 = up to twice as much. |
+
+### Columns in `quarantine_risk`
+
+| Column | What it holds | Example value |
+|----|----|----|
+| `R0` | Basic reproduction number (1 to 10) | `6` |
+| `VE` | Vaccine efficacy (0 to 0.9) | `0.5` |
+| `beta_ratio` | Risk relative to the baseline: total infection force divided by the baseline’s | `1.01` (about the same as baseline) |
+
+### Model assumptions
+
+- The values come from a computer simulation of a quarantine system that
+  follows WHO recommendations and quarantines all international arrivals
+  (Zachreson et al., 2022).
+- They describe one modelled system. Real quarantine facilities, testing
+  and traveller behaviour differ.
+- Values are relative to the baseline, not the chance of a breach.
+
+### How much do the inputs matter?
+
+As R₀ rises, the vaccine efficacy needed to match the baseline climbs
+quickly: about 0.5 at R₀ = 6 and about 0.73 at R₀ = 10.
 
 ## Calculate risk for one scenario
 
@@ -72,7 +97,7 @@ find_threshold_ve(r0 = 6, target = 0.5)
 #> [1] 0.654
 ```
 
-At R₀ = 6, VE must reach about 0.504 to keep risk at or below the
+At R₀ = 6, VE must reach about 0.5 to keep risk at or below the
 baseline. If the target cannot be met even at VE = 0.9, the function
 returns `NA`:
 
@@ -117,12 +142,15 @@ run_app()
   target (green = below, amber = about equal, red = above).
 - The *minimum VE card* gives the lowest VE that reaches your target at
   that R₀. This directly answers the app’s question.
-- In the *heatmap*, dark green is low risk and yellow/red is high. The
-  dashed line marks your target: combinations above and to the left of
-  it (high VE, low R₀) meet the target; those below and to the right
-  exceed it. The white dot is your selection.
-- The *line plot* is a slice of the heatmap at your R₀; the dotted line
-  shows the minimum VE.
+- In the *heatmap*, dark green is low risk and yellow/red is high; the
+  corners are labelled “Lower risk” and “Higher risk”. The dashed line
+  marks your target: combinations above and to the left of it (high VE,
+  low R₀) meet the target; those below and to the right exceed it. The
+  white dot is your selection.
+- The *line plot* is a slice of the heatmap at your R₀ (green line). The
+  grey lines show R₀ = 3, 6 and 10 for comparison, and the dotted red
+  line shows the minimum VE. Where the green curve crosses the dashed
+  line is the same point as on the heatmap.
 
 If you enter an acceptable risk that is empty, zero or negative, the app
 asks you to correct it. If the target cannot be met at any modelled VE,
@@ -132,6 +160,10 @@ the app says so and suggests a higher tolerance or a lower R₀.
 
 - Results are relative risks from published simulations of low-tolerance
   quarantine systems, not probabilities of a breach.
-- The data is a 10 × 10 grid with linear interpolation between points,
-  and the simulation output contains some noise.
-- The package is for exploring scenarios, not for operational decisions.
+- The data is a 10 × 10 grid with linear interpolation between points.
+  The simulation output contains some noise, which is why the dashed
+  line on the heatmap has small steps.
+- The model describes one idealised quarantine system; real-world
+  quarantine differs.
+- The package is for exploring scenarios and teaching, not for
+  operational decisions.
