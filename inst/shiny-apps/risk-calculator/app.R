@@ -80,19 +80,41 @@ ui <- fluidPage(
           h4("Fields"),
           tags$table(
             class = "table table-sm",
-            tags$thead(tags$tr(tags$th("Field"), tags$th("Meaning"))),
+            tags$thead(tags$tr(tags$th("Term"), tags$th("In plain language"), tags$th("Example"))),
             tags$tbody(
               tags$tr(tags$td("R\u2080"),
-                      tags$td("Basic reproduction number: the average number of people one infected
-                               person infects. Higher = more transmissible variant (1 to 10).")),
-              tags$tr(tags$td("VE"),
-                      tags$td("Vaccine efficacy: the proportion by which vaccination reduces
-                               infection (0 = no protection, 0.9 = 90% reduction).")),
+                      tags$td("The average number of people one infected person passes the virus to."),
+                      tags$td("R\u2080 = 3: one case infects about 3 others. R\u2080 = 6: about 6. The higher it is,
+                              the harder it is to keep quarantine leak-free.")),
+              tags$tr(tags$td("VE (vaccine efficacy)"),
+                      tags$td("How strongly vaccination protects (0 = no protection, 0.9 = 90% protection)."),
+                      tags$td("VE = 0.6 means 60% protection.")),
+              tags$tr(tags$td("Baseline"),
+                      tags$td("The benchmark risk quarantine was designed around: the original (ancestral) virus
+                              with no vaccination. In this dataset it equals R\u2080 = 3 and VE = 0."),
+                      tags$td("Baseline = 1\u00d7.")),
+              tags$tr(tags$td("Breach"),
+                      tags$td("An infection that escapes quarantine into the community."),
+                      tags$td("A traveller infected in quarantine who leaves still infectious.")),
               tags$tr(tags$td("Risk (\u00d7 baseline)"),
-                      tags$td("Total infection force relative to the pre-Delta unvaccinated
-                               baseline (value 1). It is a relative multiplier, not a probability."))
+                      tags$td("A score comparing a scenario with the baseline: 1 = the same, 2 = twice as much,
+                              0.5 = half. It is not a probability."),
+                      tags$td("R\u2080 = 10 and VE = 0.1 gives 6.8\u00d7 baseline.")),
+              tags$tr(tags$td("Acceptable risk"),
+                      tags$td("The highest risk you are willing to tolerate, as a multiple of the baseline."),
+                      tags$td("1 = no worse than baseline; 2 = up to twice as much."))
             )
           ),
+          h4("Model assumptions"),
+          tags$ul(
+            tags$li("The results come from a computer simulation of a quarantine system that follows
+                    WHO recommendations and quarantines all international arrivals (Zachreson et al., 2022)."),
+            tags$li("They describe one modelled system; real facilities, testing and compliance differ."),
+            tags$li("Values are relative to the baseline, not the chance of a breach.")
+          ),
+          h4("How much do the inputs matter?"),
+          p("As R\u2080 rises, the vaccine efficacy needed to match the baseline climbs quickly:
+            about 0.5 at R\u2080 = 6 and about 0.73 at R\u2080 = 10."),
           h4("Controls"),
           tags$ul(
             tags$li(strong("R\u2080 slider: "), "the transmissibility of the variant you are testing."),
