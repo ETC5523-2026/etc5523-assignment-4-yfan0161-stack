@@ -31,7 +31,7 @@ find_threshold_ve(r0 = 6, target = 1) # minimum VE to keep risk <= baseline
 
 ## Data
 
-R0 is the average number of people one infected person infects (for example, R0 = 3 means about three people), and VE is how strongly a vaccine protects (0.6 = 60%). The package includes `quarantine_risk`, a 100-row data frame (R0 = 1 to 10, VE = 0 to 0.9) giving total infection force relative to the pre-Delta unvaccinated baseline (1 = baseline). The values were transcribed from Figure 4 of Zachreson et al. (2022), *COVID-19 in low-tolerance border quarantine systems: Impact of the Delta variant of SARS-CoV-2*, Science Advances, 8(14), eabm3624 (<https://doi.org/10.1126/sciadv.abm3624>), which is open access under a CC BY 4.0 licence. The raw values and the preparation script are in `data-raw/`. Values are relative risks from simulation results, not probabilities of a breach.
+R0 is the average number of people one infected person infects (for example, R0 = 3 means about three people), and VE is how strongly a vaccine protects (0.6 = 60%). The package includes `quarantine_risk`, a 100-row data frame (R0 = 1 to 10, VE = 0 to 0.9) giving total infection force relative to the pre-Delta unvaccinated baseline (1 = baseline). The values were transcribed from Figure 3 of Zachreson et al. (2022), *COVID-19 in low-tolerance border quarantine systems: Impact of the Delta variant of SARS-CoV-2*, Science Advances, 8(14), eabm3624 (<https://doi.org/10.1126/sciadv.abm3624>), which is open access under a CC BY 4.0 licence. The raw values and the preparation script are in `data-raw/`. Values are relative risks from simulation results, not probabilities of a breach.
 
 ## Website
 

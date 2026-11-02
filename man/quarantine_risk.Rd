@@ -27,7 +27,7 @@ Total infection force relative to the pre-Delta unvaccinated baseline,
 across combinations of viral transmissibility (R0) and vaccine efficacy (VE).
 }
 \details{
-The values were transcribed from Figure 4 of Zachreson et al. (2022); see
+The values were transcribed from Figure 3 of Zachreson et al. (2022); see
 \code{data-raw/DATASET.R} for the preparation script. The baseline (value 1) is
 reached at R0 = 3 with no vaccination. The results come from simulations, so
 the grid contains some noise and is not perfectly monotone.
