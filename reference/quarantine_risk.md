@@ -35,7 +35,7 @@ Advances*, 8(14), eabm3624. <https://doi.org/10.1126/sciadv.abm3624>
 
 ## Details
 
-The values were transcribed from Figure 4 of Zachreson et al. (2022);
+The values were transcribed from Figure 3 of Zachreson et al. (2022);
 see `data-raw/DATASET.R` for the preparation script. The baseline
 (value 1) is reached at R0 = 3 with no vaccination. The results come
 from simulations, so the grid contains some noise and is not perfectly
