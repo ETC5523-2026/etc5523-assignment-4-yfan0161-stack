@@ -12,7 +12,7 @@ th_label <- function(th) sprintf("%.2f", ceiling(th * 100 - 1e-9) / 100)
 
 app_css <- "
 .app-header {background:#2d6a4f; color:#fff; padding:18px 24px; border-radius:8px; margin-bottom:18px;}
-.app-header h2 {margin:0 0 8px 0;}
+.app-header h2 {margin:0 0 8px 0; color:#fff;}
 .app-header p {margin:0 0 4px 0; font-size:1.05rem;}
 .result-card {padding:16px 22px; border-radius:8px; background:#f8f9fa; border-left:6px solid #2d6a4f; margin-bottom:12px;}
 .result-card.bad {border-left-color:#c1121f;}
